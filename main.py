@@ -15,10 +15,15 @@ def tts():
     data = request.json
     text = data.get("text", "")
     
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
-        output_path = f.name
-        with wave.open(f, "wb") as wav:
-            voice.synthesize(text, wav)
+    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+    tmp.close()
+    output_path = tmp.name
+
+    with wave.open(output_path, "wb") as wav:
+        wav.setnchannels(1)
+        wav.setsampwidth(2)
+        wav.setframerate(22050)
+        voice.synthesize(text, wav)
 
     return send_file(output_path, mimetype="audio/wav")
 
