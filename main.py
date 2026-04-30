@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, Response
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from piper import PiperVoice
 import wave
@@ -11,10 +11,7 @@ voice = PiperVoice.load("/root/sv_SE-nst-medium.onnx")
 
 @app.route("/")
 def index():
-    return '''
-<!DOCTYPE html>
-<html>
-<body>
+    return '''<!DOCTYPE html><html><body>
   <h2>Testa Piper TTS</h2>
   <textarea id="text" rows="4" cols="50">Hello this is a test</textarea>
   <br><br>
@@ -34,9 +31,15 @@ def index():
       document.getElementById("audio").play();
     }
   </script>
-</body>
-</html>
-'''
+</body></html>'''
+
+@app.route("/debug")
+def debug():
+    info = {
+        "sample_rate": str(getattr(voice.config, 'sample_rate', 'NOT FOUND')),
+        "config_attrs": str(dir(voice.config))
+    }
+    return str(info)
 
 @app.route("/tts", methods=["POST"])
 def tts():
@@ -47,7 +50,7 @@ def tts():
     with wave.open(tmp.name, "wb") as wav:
         wav.setnchannels(1)
         wav.setsampwidth(2)
-        wav.setframerate(voice.config.sample_rate)
+        wav.setframerate(22050)
         voice.synthesize(text, wav)
     return send_file(tmp.name, mimetype="audio/wav")
 
