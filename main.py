@@ -47,7 +47,7 @@ def tts():
     with wave.open(tmp.name, "wb") as wav:
         wav.setnchannels(1)
         wav.setsampwidth(2)
-        wav.setframerate(22050)
+        wav.setframerate(voice.config.sample_rate)
         voice.synthesize(text, wav)
     return send_file(tmp.name, mimetype="audio/wav")
 
