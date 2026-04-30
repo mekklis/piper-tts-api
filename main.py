@@ -1,21 +1,21 @@
 from flask import Flask, request, send_file
-import subprocess
+from piper import PiperVoice
+import wave
 import tempfile
 import os
 
 app = Flask(__name__)
+voice = PiperVoice.load("/root/sv_SE-nst-medium.onnx")
 
 @app.route("/tts", methods=["POST"])
 def tts():
     data = request.json
     text = data.get("text", "")
-    voice = data.get("voice", "sv_SE-nst-medium")
     
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
         output_path = f.name
-
-    cmd = f'echo "{text}" | piper --model {voice} --output_file {output_path}'
-    subprocess.run(cmd, shell=True)
+        with wave.open(f, "wb") as wav:
+            voice.synthesize(text, wav)
 
     return send_file(output_path, mimetype="audio/wav")
 
