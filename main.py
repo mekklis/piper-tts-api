@@ -1,10 +1,13 @@
 from flask import Flask, request, send_file
+from flask_cors import CORS
 from piper import PiperVoice
 import wave
 import tempfile
 import os
 
 app = Flask(__name__)
+CORS(app)
+
 voice = PiperVoice.load("/root/sv_SE-nst-medium.onnx")
 
 @app.route("/tts", methods=["POST"])
